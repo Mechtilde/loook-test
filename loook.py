@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #
 #	loook.py 0.6.8 (2010-12-04) - Search in OpenOffice.org files
