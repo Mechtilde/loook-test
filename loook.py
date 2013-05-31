@@ -3,6 +3,8 @@
 #
 #	Copyright (C) 2003-2010 Daniel Naber, Lutz Haseloff
 #
+#	Copyright (C) 2013 for the gettext integration: Dr. Michael Stehmann
+#
 #	This program is free software; you can redistribute it and/or
 #	modify it under the terms of the GNU General Public License
 #	as published by the Free Software Foundation; either version 2
@@ -380,6 +382,9 @@ class Application:
 
 if __name__ == "__main__":
 
+#
+# begin gettext integration
+#
 	loookversion = "loook-0.6.8"
 	# which is the language of the system (GNU/Linux)
 	loclang = locale.getdefaultlocale()
@@ -407,7 +412,9 @@ if __name__ == "__main__":
 
 	trans = gettext.translation(loookversion, "/usr/share/locale", [language])
 	trans.install()
-
+#
+# end gettext integration
+#
 	if len(sys.argv) >= 2 and (sys.argv[1] == '--help' or sys.argv[1] == '-h'):
 		print(_("Usage:") +" loook.py [-h|--help] " + _("[directory] [search term]..."))
 		sys.exit(1)
