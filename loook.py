@@ -268,17 +268,17 @@ class Application:
 		suffix = self.getSuffix(filename)
 		try:
 			# Handle OpenOffice.org files:
-			if suffix in ('sxw', 'stw',				# OOo 1.x swriter
-					'sxc', 'stc',					# OOo 1.x scalc
-					'sxi', 'sti'					# OOo 1.x simpress
-					'sxg',							# OOo 1.x master document
-					'sxm',							# OOo 1.x formula
-					'sxd', 'std',					# OOo 1.x sdraw
-					'odt', 'ott',					# OOo > 2.x swriter
-					'odp', 'otp',					# OOo > 2.x simpress
-					'odf',							# OOo > 2.x formula
-					'odg', 'otg',					# OOo > 2.x sdraw
-					'ods', 'ots'					# OOo > 2.x scalc
+			if suffix in ('sxw', 'stw',		# OOo   1.x swriter
+					'sxc', 'stc',		# OOo   1.x scalc
+					'sxi', 'sti'		# OOo   1.x simpress
+					'sxg',			# OOo   1.x master document
+					'sxm',			# OOo   1.x formula
+					'sxd', 'std',		# OOo   1.x sdraw
+					'odt', 'ott',		# OOo > 2.x swriter
+					'odp', 'otp',		# OOo > 2.x simpress
+					'odf',			# OOo > 2.x formula
+					'odg', 'otg',		# OOo > 2.x sdraw
+					'ods', 'ots'		# OOo > 2.x scalc
 					):
 				zip = zipfile.ZipFile(filename, "r")
 				content = ""
