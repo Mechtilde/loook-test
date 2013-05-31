@@ -1,14 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #
-#	loook.py 0.6.8 (2010-12-04) - Search in OpenOffice.org files
-#
-#	Changes 0.6.7 -> 0.6.8: search embedded files, thanks to Hanna Ruotsalainen
-#	Changes 0.6.6 -> 0.6.7: fixes to make loook work with Python 3.1.1 when started with parameters
-#	Changes 0.6.5 -> 0.6.6: made loook work with Python 3.1.1
-#
-#	Homepage: http://www.danielnaber.de/loook/
-#
 #	Copyright (C) 2003-2010 Daniel Naber, Lutz Haseloff
 #
 #	This program is free software; you can redistribute it and/or
@@ -24,6 +16,7 @@
 #	You should have received a copy of the GNU General Public License
 #	along with this program; if not, write to the Free Software
 #	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
 
 # TODO:
 #	-use better defaults for the file/dir dialogs:
