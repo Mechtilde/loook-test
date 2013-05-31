@@ -17,13 +17,6 @@
 #	along with this program; if not, write to the Free Software
 #	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
-# TODO:
-#	-use better defaults for the file/dir dialogs:
-#		askdirectory(initialdir="..."...
-#	-support KOffice and Abiword?
-#	-show title (use HListbox?)
-
 import configparser
 import codecs
 import os
@@ -228,10 +221,6 @@ class Application:
 			if not prg and os.name != 'nt':
 				tkinter.messagebox.showwarning('Error', 'Set viewer first.')
 			else:
-				#fixme: feedback if this fails
-				#fixme: feedback while OOo starts?
-				#fixme: fails if there's a quote in the prg variable (does this matter?)
-				#fixme: does a filename with quotes work on windows?
 				filename = filename.replace('"', '\\"')
 				if os.name == 'dos':
 					filename = filename.replace('/', '\\')
@@ -309,13 +298,11 @@ class Application:
 				content = ""
 				docinfo = ""
 				try:
-					# TODO: are all OOo files utf-8?
 					# search embedded files:
 					filelist = zip.namelist()
 					for filename in filelist:
 						if filename.endswith("content.xml"):
 							content += str(zip.read(filename), 'utf-8')
-					# TODO: is replace_with_space=0 correct?
 					content = self.removeXMLMarkup(content, replace_with_space=0)
 					docinfo = str(zip.read("meta.xml"), 'utf-8')
 					docinfo = self.removeXMLMarkup(docinfo, replace_with_space=0)
@@ -329,24 +316,8 @@ class Application:
 					title = title_match.group(1)
 				if self.match(query, "%s %s" % (content.lower(), docinfo.lower())):
 					return (filename, title)
-			# Handle KWord files:
-			# TODO: this will need its own viewer
-			#elif suffix == 'kwd':
-			#	zip = zipfile.ZipFile(filename, "r")
-			#	content = unicode(zip.read("maindoc.xml"), 'utf-8')
-			#	content = self.removeXMLMarkup(content, replace_with_space=0)
-			#	docinfo = unicode(zip.read("documentinfo.xml"), 'utf-8')
-			#	docinfo = self.removeXMLMarkup(docinfo, replace_with_space=0)
-			#	title = ""
-			#	title_match = re.compile("<about.*?<title>(.*?)</title>", re.DOTALL|re.IGNORECASE).search(docinfo)
-			#	if title_match:
-			#		title = title_match.group(1)
-			#	if regex.search(content.lower()) or regex.search(docinfo.lower()):
-			#		return (filename, title)
 		except zipfile.BadZipfile as err:
 			print("Warning: Supposed ZIP file '%s' could not be opened: %s" % (filename, err))
-			#if suffix == 'kwd':
-			#	print("Note that the old KOffice (< 1.2) file format is not supported.")
 		except IOError as err:
 			print("Warning: File '%s' could not be opened: %s" % (filename, err))
 		return None
@@ -416,8 +387,6 @@ class Application:
 					title = match[1]
 					if not title:
 						title = "Untitled"
-					# TODO: reactive title:
-					#self.listbox.insert('end', "%s - %s" % (filename, title))
 					display_filename = filename.replace(self.search_path.get(), '')
 					self.listbox.insert('end', "%s" % display_filename)
 					self.match_count = self.match_count + 1
