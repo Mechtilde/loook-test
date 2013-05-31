@@ -46,8 +46,6 @@ class Application:
 			config_path = os.getenv('USERPROFILE')
 		elif os.getenv('HOME'):
 			config_path = os.getenv('HOME')
-		elif os.name == 'dos':
-			config_path = "c:/"
 		if config_path:
 			self.configfile = os.path.join(config_path, self.CONFIGFILE)
 			self.config =  configparser.ConfigParser()
@@ -65,8 +63,7 @@ class Application:
 
 	def createWidgets(self):
 		"""Build and show the GUI elements."""
-		if os.name != 'nt':
-			Label(self.master, text=_("Viewer:")).grid(row=0, sticky=E)
+		Label(self.master, text=_("Viewer:")).grid(row=0, sticky=E)
 		Label(self.master, text=_("Search path:")).grid(row=1, sticky=E)
 		Label(self.master, text=_("Search terms:")).grid(row=2, sticky=E)
 		Label(self.master, text=_("Mode:")).grid(row=3, sticky=E)
@@ -108,9 +105,9 @@ class Application:
 		self.mode_menu.add_command(label=_("Phrase"), command=self.setModePhrase)
 
 		pad = 1
-		if os.name != 'nt':
-			self.ooo_path.grid(columnspan=2, row=0, column=1, sticky=E+W, pady=pad, padx=pad)
-			self.ooo_path_b.grid(row=0, column=3, sticky=E+W, pady=pad, padx=pad)
+		self.ooo_path.grid(columnspan=2, row=0, column=1, sticky=E+W, pady=pad, padx=pad)
+		self.ooo_path_b.grid(row=0, column=3, sticky=E+W, pady=pad, padx=pad)
+
 		self.search_path.grid(columnspan=2, row=1, column=1, sticky=E+W, pady=pad, padx=pad)
 		self.search_path_b.grid(row=1, column=3, sticky=E+W, pady=pad, padx=pad)
 		self.search_query.grid(columnspan=3, row=2, column=1, sticky=E+W, pady=pad, padx=pad)
@@ -207,36 +204,23 @@ class Application:
 		"""Start OOo to view the file. This method lacks 
 		error handling (TODO)."""
 		items = event.widget.curselection()
-		#try: items = map(string.atoi, items)
-		#except ValueError: pass
 		filename = "%s%s" % (self.search_path.get(), event.widget.get(items[0]))
 		filename = os.path.normpath(filename)
-		if os.name == 'nt':
-			try:
-				os.startfile(filename)
-			except:
-				print("Warning: File could not be opened. - %s" % filename)
+		prg = self.ooo_path.get()
+		if not prg:
+			tkinter.messagebox.showwarning('Error', 'Set viewer first.')
 		else:
-			prg = self.ooo_path.get()
-			if not prg and os.name != 'nt':
-				tkinter.messagebox.showwarning('Error', 'Set viewer first.')
-			else:
-				filename = filename.replace('"', '\\"')
-				if os.name == 'dos':
-					filename = filename.replace('/', '\\')
-					prg = prg.replace('/', '\\')
-				cmd = "\"%s\" \"%s\" &" % (prg, filename)
-				if os.name == 'dos':
-					cmd = "\"%s\" \"%s\"" % (prg, filename)
-				self.status.config(text="Starting viewer...")
-				print(cmd)
-				try:
-					res = os.system(cmd)
-				except UnicodeError:
-					res = os.system(cmd)
-				if res != 0:
-					# don't show a dialog, this check might not be system-indepenent:
-					print("Warning: Command returned code != 0: %s" % cmd)
+			filename = filename.replace('"', '\\" ')
+			cmd = "\"%s\" \"%s\" &" % (prg, filename)
+			self.status.config(text="Starting viewer...")
+			print(cmd)
+			try:
+				res = os.system(cmd)
+			except UnicodeError:
+				res = os.system(cmd)
+			if res != 0:
+				# don't show a dialog, this check might not be system-indepenent:
+				print("Warning: Command returned code != 0: %s" % cmd)
 		return
 
 	def removeXMLMarkup(self, s, replace_with_space):
@@ -362,7 +346,7 @@ class Application:
 		if len(dir_part) > len_limit:
 			dir_part = "%s..." % dir_part[0:len_limit]
 		#print("'%s'" % dir_part)
-		self.status.config(text=_("Searching in ")+ "%s" % dir_part)
+		self.status.config(text=_("Searching in ") + "%s" % dir_part)
 		try:
 			dir_content = os.listdir(directory)
 			dir_content.sort(key=str.lower) 
