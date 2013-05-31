@@ -39,6 +39,7 @@ import string
 import time
 import zipfile
 import locale
+import gettext
 
 from tkinter import * 
 import tkinter.filedialog
@@ -47,7 +48,7 @@ import tkinter.messagebox
 class Application:
 
 	CONFIGFILE = ".loook.cfg"
-	
+
 	def __init__(self, master=None):
 		"""Load configuration or use sensible default values."""
 		self.master = master
@@ -63,7 +64,7 @@ class Application:
 			config_path = "c:/"
 		if config_path:
 			self.configfile = os.path.join(config_path, self.CONFIGFILE)
-			self.config = configparser.ConfigParser()
+			self.config =  configparser.ConfigParser()
 			self.config.read(self.configfile)
 			try:
 				self.ooo_path_str = self.config.get("General", "ooo_path")
@@ -71,7 +72,7 @@ class Application:
 			except configparser.NoSectionError:
 				pass
 		else:
-			print >> sys.stderr, "Cannot find home directory, settings will not be saved."
+			print >> sys.stderr, _("Cannot find home directory, settings will not be saved.")
 			self.configfile = None
 		self.createWidgets()
 		return
@@ -79,11 +80,11 @@ class Application:
 	def createWidgets(self):
 		"""Build and show the GUI elements."""
 		if os.name != 'nt':
-			Label(self.master, text="Viewer:").grid(row=0, sticky=E)
-		Label(self.master, text="Search path:").grid(row=1, sticky=E)
-		Label(self.master, text="Search terms:").grid(row=2, sticky=E)
-		Label(self.master, text="Mode:").grid(row=3, sticky=E)
-		Label(self.master, text="Matches:").grid(row=4, sticky=N+E)
+			Label(self.master, text=_("Viewer:")).grid(row=0, sticky=E)
+		Label(self.master, text=_("Search path:")).grid(row=1, sticky=E)
+		Label(self.master, text=_("Search terms:")).grid(row=2, sticky=E)
+		Label(self.master, text=_("Mode:")).grid(row=3, sticky=E)
+		Label(self.master, text=_("Matches:")).grid(row=4, sticky=N+E)
 
 		self.ooo_path = Entry(self.master)
 		if self.ooo_path_str:
@@ -114,11 +115,11 @@ class Application:
 
 		self.mode_button = Button(self.master)
 		self.mode_button.bind("<Button-1>", self.popupMode)
-		self.mode_button["text"] = "AND"
+		self.mode_button["text"] = _("AND")
 		self.mode_menu = Menu(self.master, tearoff=0)
-		self.mode_menu.add_command(label="AND", command=self.setModeAND)
-		self.mode_menu.add_command(label="OR", command=self.setModeOR)
-		self.mode_menu.add_command(label="Phrase", command=self.setModePhrase)
+		self.mode_menu.add_command(label=_("AND"), command=self.setModeAND)
+		self.mode_menu.add_command(label=_("OR"), command=self.setModeOR)
+		self.mode_menu.add_command(label=_("Phrase"), command=self.setModePhrase)
 
 		pad = 1
 		if os.name != 'nt':
@@ -135,25 +136,25 @@ class Application:
 		self.listbox.bind('<Double-Button-1>', self.showDoc)
 		self.listbox.grid(columnspan=2, row=4, column=1, sticky=E+W+S+N, pady=pad, padx=pad)
 		self.scrollbar.config(command=self.listbox.yview)		
-		
+
 		f = Frame(self.master)
 		self.search = Button(f)
-		self.search["text"] = "Search"
+		self.search["text"] = _("Search")
 		self.search["command"] = self.startSearch
 		self.search.pack(side=LEFT)
 		self.quit_button = Button(f)
-		self.quit_button["text"] = "Quit"
+		self.quit_button["text"] = _("Quit")
 		self.quit_button["command"] = self.doQuit
 		self.quit_button.pack(side=RIGHT)
 		self.stop_button = Button(f)
-		self.stop_button["text"] = "Stop"
+		self.stop_button["text"] = _("Stop")
 		self.stop_button["command"] = self.stop
 		self.stop_button["state"] = DISABLED
 		self.stop_button.pack(side=RIGHT)
 		f.grid(row=5, columnspan=2, column=2, sticky=E, pady=pad, padx=pad)
 
 		self.status = Label(self.master, text="", bd=1, relief=SUNKEN, anchor=W)
-		self.status.config(text="Ready.")
+		self.status.config(text=_("Ready."))
 		self.status.grid(row=6, columnspan=4, column=0, sticky=E+W, pady=pad, padx=pad)
 		return
 
@@ -193,15 +194,15 @@ class Application:
 		return
 
 	def setModeAND(self):
-		self.setMode("AND")
+		self.setMode(_("AND"))
 		return
 
 	def setModeOR(self):
-		self.setMode("OR")
+		self.setMode(_("OR"))
 		return
 
 	def setModePhrase(self):
-		self.setMode("Phrase")
+		self.setMode(_("Phrase"))
 		return
 
 	def popupMode(self, event):
@@ -211,11 +212,11 @@ class Application:
 			# make sure to release the grab (Tk 8.0a1 only)
 			self.mode_menu.grab_release()
 		return
-		
+
 	def stop(self):
 		self.stopped = 1
 		return
-		
+
 	def showDoc(self, event):
 		"""Start OOo to view the file. This method lacks 
 		error handling (TODO)."""
@@ -255,7 +256,7 @@ class Application:
 					# don't show a dialog, this check might not be system-indepenent:
 					print("Warning: Command returned code != 0: %s" % cmd)
 		return
-		
+
 	def removeXMLMarkup(self, s, replace_with_space):
 		s = re.compile("<!--.*?-->", re.DOTALL).sub('', s)
 		repl = ''
@@ -266,14 +267,14 @@ class Application:
 
 	def match(self, query, docstring):
 		mode = self.mode_button["text"]
-		if mode == "Phrase":
+		if mode == _("Phrase"):
 			# match only documents that contain the phrase:
 			regex = re.compile(re.escape(query.lower()), re.DOTALL)
 			if regex.search(docstring):
 				return 1
 		else:
 			parts = re.split("\s+", query.strip())
-			if mode == "AND":
+			if mode == _("AND"):
 				# match only documents that contain all words:
 				match = 1
 				for part in parts:
@@ -282,7 +283,7 @@ class Application:
 						match = 0
 						break
 				return match
-			elif mode == "OR":
+			elif mode == _("OR"):
 				# match documents that contain at leats one word:
 				match = 0
 				for part in parts:
@@ -305,11 +306,11 @@ class Application:
 					'sxg',							# OOo 1.x master document
 					'sxm',							# OOo 1.x formula
 					'sxd', 'std',					# OOo 1.x sdraw
-					'odt', 'ott',					# OOo 2.x swriter
-					'odp', 'otp',					# OOo 2.x simpress
-					'odf',							# OOo 2.x formula
-					'odg', 'otg',					# OOo 2.x sdraw
-					'ods', 'ots'					# OOo 2.x scalc
+					'odt', 'ott',					# OOo > 2.x swriter
+					'odp', 'otp',					# OOo > 2.x simpress
+					'odf',							# OOo > 2.x formula
+					'odg', 'otg',					# OOo > 2.x sdraw
+					'ods', 'ots'					# OOo > 2.x scalc
 					):
 				zip = zipfile.ZipFile(filename, "r")
 				content = ""
@@ -369,16 +370,16 @@ class Application:
 			tkinter.messagebox.showwarning('Error', 
 				'Path "%s" doesn\'t exist' % self.search_path.get())
 		else:
-			start_time = time.time()
+			#start_time = time.time()
 			self.recursiveSearch(self.search_path.get())
-			duration = time.time() - start_time
+			#duration = time.time() - start_time
 			#print("time=%.2f" % duration)
-			count_str = "in %d files" % self.ooo_count
+			count_str = "%s %d %s" % (_("in"), self.ooo_count, _("files"))
 			if self.stopped:
-				self.status.config(text="%d matches so far %s (search stopped)" % (self.match_count, count_str))
+				self.status.config(text="%d %s %s %s" % (self.match_count, _("matches so far"), count_str, _("(search stopped)")))
 				self.stopped = 0
 			else:
-				self.status.config(text="%d matches %s" % (self.match_count, count_str))
+				self.status.config(text="%d %s %s" % (self.match_count, _("matches"), count_str))
 		self.stop_button["state"] = DISABLED
 		self.quit_button["state"] = NORMAL
 		return
@@ -397,7 +398,7 @@ class Application:
 		if len(dir_part) > len_limit:
 			dir_part = "%s..." % dir_part[0:len_limit]
 		#print("'%s'" % dir_part)
-		self.status.config(text="Searching in %s" % dir_part)
+		self.status.config(text=_("Searching in ")+ "%s" % dir_part)
 		try:
 			dir_content = os.listdir(directory)
 			dir_content.sort(key=str.lower) 
@@ -432,13 +433,41 @@ class Application:
 		return
 
 if __name__ == "__main__":
+
+	loookversion = "loook-0.6.8"
+	# which is the language of the system (GNU/Linux)
+	loclang = locale.getdefaultlocale()
+	language = loclang[0]
+
+	# choose only a language a .mo file exists for, else use english
+	lpath = "/usr/share/locale/"+language+"/LC_MESSAGES/"+ loookversion +".mo"
+	if not os.path.exists(lpath):
+
+		newlang = language.split("_")
+		newlang = newlang[0]
+		lpath = "/usr/share/locale/"+newlang+"/LC_MESSAGES/"+ loookversion +".mo"
+
+		if os.path.exists(lpath):
+			language = newlang
+		else:
+			newlang = language.split("@")
+			newlang = newlang[0]
+			lpath = "/usr/share/locale/"+newlang+"/LC_MESSAGES/"+ loookversion +".mo"
+
+			if os.path.exists(lpath):
+				language = newlang
+			else:
+				language = "en"
+
+	trans = gettext.translation(loookversion, "/usr/share/locale", [language])
+	trans.install()
+
 	if len(sys.argv) >= 2 and (sys.argv[1] == '--help' or sys.argv[1] == '-h'):
-		print("Usage: loook.py [-h|--help] [directory] [search term]...")
+		print(_("Usage:") +" loook.py [-h|--help] " + _("[directory] [search term]..."))
 		sys.exit(1)
 	root = Tk()
 	root.minsize(380, 200)
-	version = "0.6.5"
-	root.title("loook.py %s - OpenOffice.org File Finder" % version)
+	root.title("Loook = 0.6.8 - " + _("OpenOffice.org File Finder"))
 	root.columnconfigure(1, weight=1)
 	root.rowconfigure(4, weight=1)
 	root.columnconfigure(1, weight=1)
