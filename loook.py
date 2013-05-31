@@ -208,11 +208,11 @@ class Application:
 		filename = os.path.normpath(filename)
 		prg = self.ooo_path.get()
 		if not prg:
-			tkinter.messagebox.showwarning('Error', 'Set viewer first.')
+			tkinter.messagebox.showwarning(_('Error'), _('Set viewer first.'))
 		else:
 			filename = filename.replace('"', '\\" ')
 			cmd = "\"%s\" \"%s\" &" % (prg, filename)
-			self.status.config(text="Starting viewer...")
+			self.status.config(text=_("Starting viewer..."))
 			print(cmd)
 			try:
 				res = os.system(cmd)
